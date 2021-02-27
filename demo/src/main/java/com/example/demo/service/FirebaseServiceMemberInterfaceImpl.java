@@ -31,9 +31,14 @@ public class FirebaseServiceMemberInterfaceImpl implements FirebaseServiceMember
 		ApiFuture<DocumentSnapshot> apiFuture = documentReference.get();
 		DocumentSnapshot documentSnapshot = apiFuture.get();
 		Member member = null;
+		String teamKeyword = "tripamigo";
 		if (documentSnapshot.exists()) {
 			member = documentSnapshot.toObject(Member.class);
-			return member;
+			if(member.getTeam().equals(teamKeyword)) {
+				return member;
+			}else {
+				return null;
+			}
 		} else {
 			return null;
 		}
@@ -53,5 +58,6 @@ public class FirebaseServiceMemberInterfaceImpl implements FirebaseServiceMember
 		ApiFuture<WriteResult> apiFuture = firestore.collection(COLLECTION_NAME).document(id).delete();
 		return "Document id: " + id + " delete";
 	}
+	
 
 }
