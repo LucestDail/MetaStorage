@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!--부트스트랩 css 추가-->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<h1>you result about <span th:text="${meta.id}"></span></h1><br>
+<table class = "table">
+	<tr>
+		<th>name_eng</th>
+		<th>name_kor</th>
+		<th>save_team</th>
+		<th>save_name</th>
+		<th>save_date</th>
+		<th>explanation</th>
+	</tr>
+	<tr>
+		<td><span th:text="${meta.name_eng}"></span></td>
+		<td><span th:text="${meta.name_kor}"></span></td>
+		<td><span th:text="${meta.save_team}"></span></td>
+		<td><span th:text="${meta.save_name}"></span></td>
+		<td><span th:text="${meta.save_date}"></span></td>
+		<td><span th:text="${meta.explanation}"></span></td>
+	</tr>
+</table>
+
+
+    <!--부트스트랩 js, jquery 추가-->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+</body>
+</html>
