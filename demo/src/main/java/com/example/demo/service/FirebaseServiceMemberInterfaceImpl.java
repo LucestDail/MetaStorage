@@ -1,13 +1,19 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.Member;
+import com.example.demo.domain.Meta;
 import com.example.demo.interfaces.FirebaseServiceMemberInterface;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 
@@ -25,13 +31,13 @@ public class FirebaseServiceMemberInterfaceImpl implements FirebaseServiceMember
 	}
 
 	@Override
-	public Member getMemberDetail(String id) throws Exception {
+	public Member getMemberDetail(String id, String team) throws Exception {
 		Firestore firestore = FirestoreClient.getFirestore();
 		DocumentReference documentReference = firestore.collection(COLLECTION_NAME).document(id);
 		ApiFuture<DocumentSnapshot> apiFuture = documentReference.get();
 		DocumentSnapshot documentSnapshot = apiFuture.get();
 		Member member = null;
-		String teamKeyword = "tripamigo";
+		String teamKeyword = team;
 		if (documentSnapshot.exists()) {
 			member = documentSnapshot.toObject(Member.class);
 			if(member.getTeam().equals(teamKeyword)) {
@@ -58,6 +64,45 @@ public class FirebaseServiceMemberInterfaceImpl implements FirebaseServiceMember
 		ApiFuture<WriteResult> apiFuture = firestore.collection(COLLECTION_NAME).document(id).delete();
 		return "Document id: " + id + " delete";
 	}
-	
 
+	public Member memberLogin(Member member) {
+		try {
+			Firestore firestore = FirestoreClient.getFirestore();
+			DocumentReference documentReference = firestore.collection(COLLECTION_NAME).document(member.getId());
+			ApiFuture<DocumentSnapshot> apiFuture = documentReference.get();
+			DocumentSnapshot documentSnapshot = apiFuture.get();
+			if (documentSnapshot.exists()) {
+				Member curMember = documentSnapshot.toObject(Member.class);
+				if(curMember.getPassword().equals(member.getPassword())) {
+					return curMember;
+				}else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<Member> getAllMember(String team) {
+		String teamname = team;
+		List<Member> teamlist = new ArrayList<>();
+		try {
+			Firestore firestore = FirestoreClient.getFirestore();
+			ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
+			List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+			for(QueryDocumentSnapshot document : documents) {
+				Member member = document.toObject(Member.class);
+				if(member.getTeam().equals(teamname))
+					teamlist.add(document.toObject(Member.class));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println(teamlist);
+		return teamlist;
+	}
 }

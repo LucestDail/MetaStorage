@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>Index Page</title>
@@ -14,32 +14,47 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-<h1>search</h1><br>
+<div>
+<h1><span th:text="${session.member.team}"></span>팀, <span th:text="${session.member.id}"></span>님!</h1><br>
 <table class="table">
 	<tr>
 		<th>
-			검색키워드
+			메타데이터 검색을 하세요!
 		</th>
 		<td>
-			 <input type="text" id="searchtarget" class="form-control">
+			<a href="metasearch" class="btn btn-primary">검색</a><br>
+		</td>
+	</tr>
+	<tr>
+		<th>
+			개인 정보를 확인하세요!
+		</th>
+		<td>
+			<a th:href="@{'getMemberDetail?id='+${session.member.id}}" class="btn btn-primary">내정보</a><br>	
+	</tr>
+	<tr>
+		<th>
+			팀의 맴버를 확인하세요!
+		</th>
+		<td>
+<a th:href="@{'getTeamDetail?team='+${session.member.team}}" class="btn btn-primary">팀 맴버</a><br>
+		</td>
+	</tr>
+	<tr>
+		<th>
+			팀의 전체 메타 데이터를 확인하세요!
+		</th>
+		<td>
+<a href="getAllMeta" class="btn btn-primary">팀 메타데이터</a>
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2" align="center">
-			<input type="button" value = "meta 검색" id="btnmetasearch" class="btn btn-primary">
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2" align="center">
-			
-<a href="insertMeta" class="btn btn-primary">meta 등록</a>
-<a href="getAllMeta" class="btn btn-primary">see all meta</a>
-<input type="button" class="btn btn-primary" value="돌아가기" onclick="location.href='main'">
+			<a href="logout" class="btn btn-primary">로그아웃</a>
 		</td>
 	</tr>
 </table>
- 
-<br>
+</div>
     <!--custom js 추가-->
     <script src="/js/main.js"></script>
 </body>

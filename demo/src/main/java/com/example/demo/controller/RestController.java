@@ -1,5 +1,11 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +18,7 @@ import com.example.demo.domain.Member;
 import com.example.demo.domain.Meta;
 import com.example.demo.service.FirebaseServiceMemberInterfaceImpl;
 import com.example.demo.service.FirebaseServiceMetaInterfaceImpl;
+import com.google.api.client.http.HttpRequest;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
@@ -21,7 +28,21 @@ public class RestController {
 	FirebaseServiceMetaInterfaceImpl firebaseServiceMeta;
 	
 	@GetMapping("/")
-	public ModelAndView index(Model model) {
+	public ModelAndView login(Model model) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("member/login.html");
+		return mav;
+	}
+	
+	@GetMapping("/main")
+	public ModelAndView loginMain(Model model) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("main/main.html");
+		return mav;
+	}
+	
+	@GetMapping("/metasearch")
+	public ModelAndView loginIndex(Model model) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("main/index.html");
 		return mav;
@@ -36,12 +57,21 @@ public class RestController {
 	public ModelAndView getLoginform() {
 		return new ModelAndView("main/login.html");
 	}
-	/*
-	@PostMapping("/login")
-	public Member postMemberLogin(@RequestBody Member member) throws Exception{
-		return firebaseServiceMember.memberLogin(member.getId());
+	
+	@PostMapping("/loginMember")
+	public String postMemberLogin(@RequestBody Member member, HttpServletRequest request) throws Exception{
+		try {
+			if(firebaseServiceMember.memberLogin(member) != null) {
+				Member logonMember = firebaseServiceMember.memberLogin(member);
+				HttpSession session = request.getSession();
+		    	session.setAttribute("member", firebaseServiceMember.getMemberDetail(member.getId(),logonMember.getTeam()));
+				return "success";
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "fail";
 	}
-	*/
 	
 	@PostMapping("/insertMember")
     public String insertMember(@RequestBody Member member) throws Exception{
@@ -49,18 +79,54 @@ public class RestController {
     }
 
     @GetMapping("/getMemberDetail")
-    public Member getMemberDetail(@RequestParam String id) throws Exception{
-        return firebaseServiceMember.getMemberDetail(id);
+    public ModelAndView getMemberDetail(@RequestParam String id, HttpServletRequest request) throws Exception{
+    	ModelAndView mav = new ModelAndView();
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	Member member = firebaseServiceMember.getMemberDetail(id,team);
+        mav.addObject(member);
+        mav.setViewName("member/mypage.html");
+        return mav;
     }
 
+    @GetMapping("/mypage")
+    public ModelAndView loginMypage(HttpSession session) {
+    	return new ModelAndView("member/mypage.html");
+    }
+    
+    @GetMapping("/getTeamDetail")
+    public ModelAndView loginTeampage(@RequestParam String team) {
+    	System.out.println(team);
+    	ModelAndView mav = new ModelAndView();
+    	List<Member> teamlist = new ArrayList<>();
+    	teamlist = firebaseServiceMember.getAllMember(team);
+    	mav.addObject("teamlist",teamlist);
+    	mav.setViewName("member/teampage.html");
+        return mav;
+    }
+    
     @GetMapping("/updateMember")
-    public String updateMember(@RequestParam Member member) throws Exception{
-        return firebaseServiceMember.updateMember(member);
+	public ModelAndView logingetUpdate() {
+    	return new ModelAndView("member/update.html");
+	}
+    
+    @PostMapping("/updateMember")
+    public String loginUpdateMember(@RequestBody Member member, HttpServletRequest request) throws Exception{
+    	System.out.println(member);
+    	firebaseServiceMember.updateMember(member);
+		HttpSession session = request.getSession();
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	session.setAttribute("member", firebaseServiceMember.getMemberDetail(member.getId(),team));
+        return "success";
     }
 
     @GetMapping("/deleteMember")
-    public String deleteMember(@RequestParam String id) throws Exception{
-        return firebaseServiceMember.deleteMember(id);
+    public ModelAndView loginDeleteMember(@RequestParam String id, HttpServletRequest request) throws Exception{
+    	firebaseServiceMember.deleteMember(id);
+    	HttpSession session = request.getSession();
+    	session.invalidate();
+        return new ModelAndView("member/login.html");
     }
     /*
     @GetMapping("/getMetaDetail")
@@ -69,28 +135,66 @@ public class RestController {
     }
     */
     
-    @GetMapping("/getAllMeta")
-    public ModelAndView getAllMeta() throws Exception{
-    	ModelAndView mav = new ModelAndView();
-    	return mav;
+    @GetMapping("/logout")
+    public ModelAndView logout(HttpServletRequest request) {
+    	HttpSession session = request.getSession();    	
+    	session.invalidate();
+    	return new ModelAndView("member/login.html");
     }
     
-    @GetMapping("/getMetaDetail")
-    public ModelAndView getMetaDetail(@RequestParam String id) throws Exception{
+    @GetMapping("/getAllMeta")
+    public ModelAndView loginGetAllMeta(HttpServletRequest request) throws Exception{ 
     	ModelAndView mav = new ModelAndView();
-    	//it would me session team name
-    	String searchid = id+"_"+"tripamigo";
-    	Meta meta = firebaseServiceMeta.getMetaDetail(searchid);
-    	System.out.println("length : " + meta.getSave_team().length() + "," + meta.getId().length());
-    	System.out.println(meta);
-    	meta.setId(meta.getId().substring(0,meta.getId().length() - meta.getSave_team().length()-1));
-    	mav.addObject("meta",meta);
+    	List<Meta> metalist = new ArrayList<>();
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	metalist = firebaseServiceMeta.getAllMeta(team);
+    	for(Meta meta : metalist) {
+    		meta.setId(meta.getId().substring(0,meta.getId().length() - meta.getSave_team().length()-1));
+    	}
+    	mav.addObject("metalist",metalist);
     	mav.setViewName("meta/result.html");
     	return mav;
     }
     
+    @GetMapping("/getMetaDetail")
+    public ModelAndView loginGetMetaDetail(@RequestParam String id, HttpServletRequest request) throws Exception{
+    	System.out.println("metadetail run");
+    	ModelAndView mav = new ModelAndView();
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String searchid = id+"_"+team;
+    	Meta meta = firebaseServiceMeta.getMetaDetail(searchid,team);
+    	meta.setId(meta.getId().substring(0,meta.getId().length() - meta.getSave_team().length()-1));
+    	mav.addObject("metaid",meta.getId());
+    	List<Meta> metalist = new ArrayList<>();
+    	metalist.add(meta);
+    	mav.addObject("meta",meta);
+    	mav.addObject("metalist",metalist);
+    	mav.setViewName("meta/result.html");
+    	return mav;
+    }
+    
+    @GetMapping("/getMetaInfo")
+    public ModelAndView loginGetMetaInfo(@RequestParam String id, HttpServletRequest request) throws Exception{
+    	System.out.println("metadetail run");
+    	ModelAndView mav = new ModelAndView();
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String searchid = id+"_"+team;
+    	Meta meta = firebaseServiceMeta.getMetaDetail(searchid,team);
+    	meta.setId(meta.getId().substring(0,meta.getId().length() - meta.getSave_team().length()-1));
+    	mav.addObject("metaid",meta.getId());
+    	List<Meta> metalist = new ArrayList<>();
+    	metalist.add(meta);
+    	mav.addObject("meta",meta);
+    	mav.addObject("metalist",metalist);
+    	mav.setViewName("meta/metainfo.html");
+    	return mav;
+    }
+    
     @GetMapping("/failurl")
-    public ModelAndView getFailUrl(@RequestParam String id) {
+    public ModelAndView loginGetFailUrl(@RequestParam String id) {
     	ModelAndView mav = new ModelAndView();
     	mav.addObject("id", id);
     	mav.setViewName("meta/failurl.html");
@@ -98,13 +202,59 @@ public class RestController {
     }
     
     @GetMapping("/insertMeta")
-    public ModelAndView insertMetaForm() {
+    public ModelAndView loginInsertMetaForm() {
     	return new ModelAndView("meta/insertmeta.html");
     }
     
     @PostMapping("/insertMeta")
-    public String insertMeta(@RequestBody Meta meta) throws Exception{
-        return firebaseServiceMeta.insertMeta(meta);
+    public String loginInsertMeta(@RequestBody Meta meta, HttpServletRequest request) throws Exception{
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+        return firebaseServiceMeta.insertMeta(meta,sessionMember);
+    }
+    
+    @GetMapping("/metaUpdate")
+    public ModelAndView loginUpdateMetaForm(@RequestParam String id, HttpServletRequest request) {
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String searchid = id+"_"+team;
+    	Meta meta = null;
+		try {
+			meta = firebaseServiceMeta.getMetaDetail(searchid,team);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	meta.setId(meta.getId().substring(0,meta.getId().length() - meta.getSave_team().length()-1));
+    	ModelAndView mav = new ModelAndView();
+    	mav.addObject("meta",meta);
+    	mav.setViewName("meta/metaupdate.html");
+    	return mav;
+    }
+    
+    @PostMapping("/metaUpdate")
+    public String loginUpdateMeta(@RequestBody Meta inputMeta, HttpServletRequest request) {
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String searchid = inputMeta.getId()+"_"+team;
+    	Meta meta = null;
+		try {
+			meta = firebaseServiceMeta.getMetaDetail(searchid,team);
+			if(firebaseServiceMeta.updateMeta(inputMeta, sessionMember) != null) {
+				return "success";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return "fail";
+    }
+    
+    @GetMapping("/metaDelete")
+    public ModelAndView loginDeleteMeta(@RequestParam String id) {
+    	try {
+			firebaseServiceMeta.deleteMeta(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return new ModelAndView("main/index.html");
     }
     
 }

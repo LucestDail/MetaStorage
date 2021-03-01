@@ -10,35 +10,28 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
 </head>
 <body>
-
-<h1>you result</h1><br>
+<h1>Meta Information : <span th:text="${meta.id}"></span></h1><br>
+<input type="hidden" th:value="${meta.id}" id="id">
 <table class = "table">
+	<tr><th>name_eng</th>
+		<td><input type="text" id="name_eng" th:value="${meta.name_eng}"></td></tr>
 	<tr>
-		<th>name_eng</th>
 		<th>name_kor</th>
-		<th>save_team</th>
-		<th>save_name</th>
-		<th>save_date</th>
+		<td><input type="text" id="name_kor" th:value="${meta.name_kor}"></td></tr>
+	<tr>
 		<th>explanation</th>
-	</tr>
-	<tr th:each="meta:${metalist}">
-		<td><a th:href="@{'getMetaInfo?id='+${meta.id}}"><span th:text="${meta.id}"></span></a></td>
-		<td><span th:text="${meta.name_kor}"></span></td>
-		<td><span th:text="${meta.save_team}"></span></td>
-		<td><span th:text="${meta.save_name}"></span></td>
-		<td><span th:text="${meta.save_date}"></span></td>
-		<td><span th:text="${meta.explanation}"></span></td>
-	</tr>
+		<td><input type="text" id="explanation" th:value="${meta.explanation}"></td></tr>
 	<tr>
 		<td colspan="6" align="center">
-			<input type="button" class="btn btn-primary" value="돌아가기" onclick="location.href='metasearch'">
+			<input type="button" value="update" id="btnmetaupdate" class="btn btn-primary">
+			<a th:href="@{'getMetaDetail?id='+${meta.id}}" class="btn btn-primary">돌아가기</a>
 		</td>
 	</tr>
 </table>
     <!--부트스트랩 js, jquery 추가-->
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-    <!--custom js 추가-->
+<!--custom js 추가-->
     <script src="/js/main.js"></script>
 </body>
 </html>

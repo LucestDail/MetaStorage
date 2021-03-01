@@ -13,42 +13,41 @@
 <table class = "table">
 <tr>
 	<th>
-		variable_id
+		id
 	</th>
 	<td>
-		<input type="text" id="id">
+		<input th:value="${session.member.id}" type="text" id="id" readonly>
 	</td>
 	</tr>
 	<tr>
 	<th>
-		full_name_eng
+		password
 	</th>
 	<td>
-		<input type="text" id="name_eng">
+		<input th:value="${session.member.password}" type="text" id="password">
 	</td>
 	</tr>
 	<tr>
 	<th>
-		name_kor
+		name
 	</th>
 	<td>
-		<input type="text" id="name_kor">
+		<input th:value="${session.member.name}" type="text" id="name">
 	</td>
 	</tr>
 	<tr>
 	<th>
-		explanation
+		team
 	</th>
 	<td>
-		<input type="text" id="explanation">
+		<input th:value="${session.member.team}" type="text" id="team">
 	</td>
-	</tr>
-	<tr>
+</tr>
+<tr>
 	<td colspan="2" align="center">
-		<input type="button" value = "insert" id="btnmetainsert" class="btn btn-primary">
-		<input type="button" value ="돌아가기" class="btn btn-primary" onclick="location.href='metasearch'">
+		<input type="button" value = "register" id="btnmemberupdate" class="btn btn-primary">
 	</td>
-	</tr>
+</tr>
 </table>
     <!--부트스트랩 js, jquery 추가-->
     <script src="/js/jquery.min.js"></script>

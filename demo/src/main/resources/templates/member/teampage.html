@@ -10,33 +10,25 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
 </head>
 <body>
+
+<h1>you result</h1><br>
 <table class = "table">
-<tr>
-	<th>
-		id
-	</th>
-	<td>
-		<input type="text" id="id">
-	</td>
+	<tr>
+		<th>id</th>
+		<th>name</th>
+	</tr>
+	<tr th:each="team:${teamlist}">
+		<td><span th:text="${team.id}"></span></td>
+		<td><span th:text="${team.name}"></span></td>
 	</tr>
 	<tr>
-	<th>
-		password
-	</th>
-	<td>
-		<input type="text" id="password">
-	</td>
+		<td colspan="2">
+			<a href="/main">돌아가기</a>
+		</td>
 	</tr>
-	<tr>
-	<td colspan="2" align="center" class="btn btn-primary">
-		<input type="button" value = "register" id="btnmemberregister">
-	</td>
-</tr>
 </table>
     <!--부트스트랩 js, jquery 추가-->
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-    <!--custom js 추가-->
-    <script src="/js/main.js"></script>
 </body>
 </html>

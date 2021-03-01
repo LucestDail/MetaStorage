@@ -1,7 +1,5 @@
 package com.example.demo.domain;
 
-import java.util.Date;
-
 import com.google.cloud.Timestamp;
 
 import lombok.Data;
