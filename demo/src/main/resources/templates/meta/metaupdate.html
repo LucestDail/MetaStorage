@@ -10,20 +10,23 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
 </head>
 <body>
-<h1>Meta Information : <span th:text="${meta.id}"></span></h1><br>
+<h1>메타 데이터 수정 : <span th:text="${meta.id}"></span></h1><br>
 <input type="hidden" th:value="${meta.id}" id="id">
 <table class = "table">
-	<tr><th>name_eng</th>
+	<tr><th>영문명칭</th>
 		<td><input type="text" id="name_eng" th:value="${meta.name_eng}"></td></tr>
 	<tr>
-		<th>name_kor</th>
+		<th>한글명칭</th>
 		<td><input type="text" id="name_kor" th:value="${meta.name_kor}"></td></tr>
+		<tr>
+		<th>변수타입</th>
+		<td><input type="text" id="type" th:value="${meta.type}"></td></tr>
 	<tr>
-		<th>explanation</th>
+		<th>설명</th>
 		<td><input type="text" id="explanation" th:value="${meta.explanation}"></td></tr>
 	<tr>
-		<td colspan="6" align="center">
-			<input type="button" value="update" id="btnmetaupdate" class="btn btn-primary">
+		<td colspan="2" align="center">
+			<input type="button" value="수정" id="btnmetaupdate" class="btn btn-primary">
 			<a th:href="@{'getMetaDetail?id='+${meta.id}}" class="btn btn-primary">돌아가기</a>
 		</td>
 	</tr>

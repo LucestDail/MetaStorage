@@ -15,7 +15,7 @@
 </head>
 <body>
 <div>
-<h1><span th:text="${session.member.team}"></span>팀, <span th:text="${session.member.id}"></span>님!</h1><br>
+<h1><span th:text="${session.member.team}"></span>팀, <span th:text="${session.member.name}"></span>님!</h1><br>
 <table class="table">
 	<tr>
 		<th>
@@ -46,6 +46,14 @@
 		</th>
 		<td>
 <a href="getAllMeta" class="btn btn-primary">팀 메타데이터</a>
+		</td>
+	</tr>
+		<tr>
+		<th>
+			팀과 의논하세요!
+		</th>
+		<td>
+<a href="boardlist" class="btn btn-primary">팀 게시판</a>
 		</td>
 	</tr>
 	<tr>

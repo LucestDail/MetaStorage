@@ -25,6 +25,12 @@ main = {
         $('#btnmetaupdate').on('click', function () {
             _this.metaupdate();
         });
+        $('#btnboardupdate').on('click', function () {
+            _this.boardupdate();
+        });
+        $('#btnboardinsert').on('click', function () {
+            _this.boardinsert();
+        });
     },
     msearch : function () {
     	console.log("meta-search activated");
@@ -84,7 +90,8 @@ main = {
 			id:$('#id').val(),
 			name_eng:$('#name_eng').val(),
 			name_kor:$('#name_kor').val(),
-			explanation:$('#explanation').val()
+			explanation:$('#explanation').val(),
+			type:$('#type').val()
 			}
 		console.log(data);
 		//location.href=url;
@@ -100,7 +107,7 @@ main = {
         	console.log("minsert complete");
             //location.reload();
 			alert("register meta data!");
-			location.href="./";
+			location.href="./metasearch";
         })
         .fail(function (error) {
         	console.log("register meta data fail");
@@ -180,7 +187,8 @@ main = {
 			id:$('#id').val(),
 			name_eng:$('#name_eng').val(),
 			name_kor:$('#name_kor').val(),
-			explanation:$('#explanation').val()
+			explanation:$('#explanation').val(),
+			type:$('#type').val()
 			}
 		console.log(data);
 		var url="/metaUpdate";
@@ -203,6 +211,61 @@ main = {
         })
         .fail(function (error) {
         	console.log("meta update fail");
+        	console.log(JSON.stringify(error));
+			alert("something wrong... contact -> 01024299420")
+        });
+    },boardinsert : function () {
+    	console.log("board insert activated");
+		var data={
+			title:$('#title').val(),
+			content:$('#content').val()
+			}
+		console.log(data);
+		var url="/insertBoard";
+		$.ajax({
+            type:'POST',
+            url:url,
+            dataType:"text",
+            contentType:'application/json; charset=utf-8',
+            data:JSON.stringify(data),
+        })
+        .done(function() {
+        	console.log("board insert complete");
+            location.href="boardlist";
+        })
+        .fail(function (error) {
+        	console.log("board insert fail");
+        	console.log(JSON.stringify(error));
+			alert("something wrong... contact -> 01024299420")
+        });
+    },boardupdate : function () {
+    	console.log("board update activated");
+		var data={
+			id:$('#id').val(),
+			title:$('#title').val(),
+			content:$('#content').val()
+			}
+		console.log(data);
+		var url="/updateBoard";
+		$.ajax({
+            type:'POST',
+            url:url,
+            dataType:"text",
+            contentType:'application/json; charset=utf-8',
+            data:JSON.stringify(data),
+        })
+        .done(function(data) {
+        	console.log("board update complete");
+            if(data==="success"){
+				alert("Update!");
+				location.reload();
+			}else{
+				alert("Update fail");
+				location.href="boardlist";
+			}
+        })
+        .fail(function (error) {
+        	console.log("board update fail");
         	console.log(JSON.stringify(error));
 			alert("something wrong... contact -> 01024299420")
         });

@@ -5,13 +5,11 @@ import com.google.cloud.Timestamp;
 import lombok.Data;
 
 @Data
-public class Meta {
+public class Board {
 	private String id;
-	private String name_kor;
-	private String name_eng;
-	private String explanation;
+	private String title;
+	private String content;
 	private String save_team;
 	private Timestamp save_date;
 	private String save_name;
-	private String type;
 }

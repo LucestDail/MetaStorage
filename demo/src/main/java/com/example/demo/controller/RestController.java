@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.example.demo.domain.Board;
 import com.example.demo.domain.Member;
 import com.example.demo.domain.Meta;
+import com.example.demo.service.FirebaseServiceBoardInterfaceImpl;
 import com.example.demo.service.FirebaseServiceMemberInterfaceImpl;
 import com.example.demo.service.FirebaseServiceMetaInterfaceImpl;
 import com.google.api.client.http.HttpRequest;
@@ -26,6 +28,8 @@ public class RestController {
 	FirebaseServiceMemberInterfaceImpl firebaseServiceMember;
 	@Autowired
 	FirebaseServiceMetaInterfaceImpl firebaseServiceMeta;
+	@Autowired
+	FirebaseServiceBoardInterfaceImpl firebaseServiceBoard;
 	
 	@GetMapping("/")
 	public ModelAndView login(Model model) {
@@ -257,4 +261,86 @@ public class RestController {
         return new ModelAndView("main/index.html");
     }
     
+    
+    
+    @GetMapping("/insertBoard")
+    public ModelAndView insertBoard() {
+    	return new ModelAndView("board/insertboard.html");
+    }
+    
+    @PostMapping("/insertBoard")
+    public String insertBoard(@RequestBody Board board, HttpServletRequest request) throws Exception{
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+        return firebaseServiceBoard.insertBoard(board,sessionMember);
+    }
+    
+    @GetMapping("/updateBoard")
+    public ModelAndView updateBoard(@RequestParam String id, HttpServletRequest request) {
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String searchid = id;
+    	Board board = null;
+		try {
+			board = firebaseServiceBoard.getBoardDetail(searchid,team);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	ModelAndView mav = new ModelAndView();
+    	mav.addObject("board",board);
+    	mav.setViewName("board/updateboard.html");
+    	return mav;
+    }
+    
+    @PostMapping("/updateBoard")
+    public String updateBoard(@RequestBody Board inputBoard, HttpServletRequest request) {
+    	System.out.println("update : " + inputBoard);
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String searchid = inputBoard.getId();
+    	Board board = null;
+		try {
+			board = firebaseServiceBoard.getBoardDetail(searchid,team);
+			if(firebaseServiceBoard.updateBoard(inputBoard, sessionMember) != null) {
+				return "success";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return "fail";
+    }
+    
+    @GetMapping("/boardlist")
+    public ModelAndView boardlist(HttpServletRequest request) throws Exception{ 
+    	ModelAndView mav = new ModelAndView();
+    	List<Board> boardlist = new ArrayList<>();
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	boardlist = firebaseServiceBoard.getAllBoard(team);
+    	mav.addObject("boardlist",boardlist);
+    	mav.setViewName("board/boardlist.html");
+    	return mav;
+    }
+    
+    @GetMapping("/infoBoard")
+    public ModelAndView infoBoard(@RequestParam String id, HttpServletRequest request) throws Exception{
+    	ModelAndView mav = new ModelAndView();
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String searchid = id;
+    	Board board = firebaseServiceBoard.getBoardDetail(searchid,team);
+    	System.out.println(board);
+    	mav.addObject("board",board);
+    	mav.setViewName("board/infoboard.html");
+    	return mav;
+    }
+    
+    @GetMapping("/deleteBoard")
+    public ModelAndView deleteBoard(@RequestParam String id) {
+    	try {
+			firebaseServiceBoard.deleteBoard(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return new ModelAndView("main/main.html");
+    }
 }
