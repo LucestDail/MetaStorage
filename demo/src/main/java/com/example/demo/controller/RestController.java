@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.demo.domain.Board;
+import com.example.demo.domain.Comment;
 import com.example.demo.domain.Member;
 import com.example.demo.domain.Meta;
 import com.example.demo.service.FirebaseServiceBoardInterfaceImpl;
+import com.example.demo.service.FirebaseServiceCommentInterfaceImpl;
 import com.example.demo.service.FirebaseServiceMemberInterfaceImpl;
 import com.example.demo.service.FirebaseServiceMetaInterfaceImpl;
-import com.google.api.client.http.HttpRequest;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
@@ -30,6 +31,8 @@ public class RestController {
 	FirebaseServiceMetaInterfaceImpl firebaseServiceMeta;
 	@Autowired
 	FirebaseServiceBoardInterfaceImpl firebaseServiceBoard;
+	@Autowired
+	FirebaseServiceCommentInterfaceImpl firebaseServiceComment;
 	
 	@GetMapping("/")
 	public ModelAndView login(Model model) {
@@ -328,8 +331,11 @@ public class RestController {
     	String team = sessionMember.getTeam();
     	String searchid = id;
     	Board board = firebaseServiceBoard.getBoardDetail(searchid,team);
+    	List<Comment> commentlist = new ArrayList<>();
+    	commentlist = firebaseServiceComment.getAllComment(board,sessionMember);
     	System.out.println(board);
     	mav.addObject("board",board);
+    	mav.addObject("commentlist",commentlist);
     	mav.setViewName("board/infoboard.html");
     	return mav;
     }
