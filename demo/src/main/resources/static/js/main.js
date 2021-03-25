@@ -31,6 +31,12 @@ main = {
         $('#btnboardinsert').on('click', function () {
             _this.boardinsert();
         });
+        $('#btncommentinsert').on('click', function () {
+            _this.commentinsert();
+        });
+        $('#btncommentdelete').on('click', function () {
+            _this.commentdelete();
+        });
     },
     msearch : function () {
     	console.log("meta-search activated");
@@ -266,6 +272,53 @@ main = {
         })
         .fail(function (error) {
         	console.log("board update fail");
+        	console.log(JSON.stringify(error));
+			alert("something wrong... contact -> 01024299420")
+        });
+    },commentinsert : function () {
+    	console.log("comment insert activated");
+		var data={
+			boardId:$('#boardId').val(),
+			content:$('#content').val()
+			}
+		console.log(data);
+		var url="/insertComment";
+		$.ajax({
+            type:'POST',
+            url:url,
+            dataType:"text",
+            contentType:'application/json; charset=utf-8',
+            data:JSON.stringify(data),
+        })
+        .done(function() {
+        	console.log("comment insert complete");
+            location.reload();
+        })
+        .fail(function (error) {
+        	console.log("comment insert fail");
+        	console.log(JSON.stringify(error));
+			alert("something wrong... contact -> 01024299420")
+        });
+    },commentdelete : function () {
+    	console.log("comment delete activated");
+		var data={
+			id:$('#commentid').val()
+			}
+		console.log(data);
+		var url="/deleteComment";
+		$.ajax({
+            type:'POST',
+            url:url,
+            dataType:"text",
+            contentType:'application/json; charset=utf-8',
+            data:JSON.stringify(data),
+        })
+        .done(function() {
+        	console.log("comment delete complete");
+            location.reload();
+        })
+        .fail(function (error) {
+        	console.log("comment delete fail");
         	console.log(JSON.stringify(error));
 			alert("something wrong... contact -> 01024299420")
         });

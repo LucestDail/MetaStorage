@@ -8,12 +8,17 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.example.demo.auth.SocialLoginType;
 import com.example.demo.domain.Board;
 import com.example.demo.domain.Comment;
 import com.example.demo.domain.Member;
@@ -22,8 +27,15 @@ import com.example.demo.service.FirebaseServiceBoardInterfaceImpl;
 import com.example.demo.service.FirebaseServiceCommentInterfaceImpl;
 import com.example.demo.service.FirebaseServiceMemberInterfaceImpl;
 import com.example.demo.service.FirebaseServiceMetaInterfaceImpl;
+import com.example.demo.service.OauthService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @org.springframework.web.bind.annotation.RestController
+@CrossOrigin
+@RequiredArgsConstructor
+@Slf4j
 public class RestController {
 	@Autowired
 	FirebaseServiceMemberInterfaceImpl firebaseServiceMember;
@@ -33,6 +45,19 @@ public class RestController {
 	FirebaseServiceBoardInterfaceImpl firebaseServiceBoard;
 	@Autowired
 	FirebaseServiceCommentInterfaceImpl firebaseServiceComment;
+	
+	private final OauthService oauthService;
+	@RequestMapping(value="/auth/google", method = {RequestMethod.GET, RequestMethod.POST})
+	public void socialLoginType() {
+		log.info(">> oauth login method invoke :: {} Social Login",SocialLoginType.GOOGLE);
+		oauthService.request(SocialLoginType.GOOGLE);
+	}
+	
+	@RequestMapping(value="auth/google/callback", method = {RequestMethod.GET, RequestMethod.POST})
+	public String socialGoogleCallback (Model model) {
+		return "socialGoogleCallback Success";
+	}
+	
 	
 	@GetMapping("/")
 	public ModelAndView login(Model model) {
@@ -58,6 +83,10 @@ public class RestController {
 	@GetMapping("/register")
 	public ModelAndView getRegister() {
 		return new ModelAndView("member/register.html");
+	}
+	@GetMapping("/google_login")
+	public String getGoogleLogin() {
+		return "google login";
 	}
 	
 	@GetMapping("/login")
@@ -348,5 +377,36 @@ public class RestController {
 			e.printStackTrace();
 		}
         return new ModelAndView("main/main.html");
+    }
+    
+    @PostMapping("/insertComment")
+    public String insertComment(@RequestBody Comment comment, HttpServletRequest request) {
+    	System.out.println(comment);
+    	Member sessionMember = (Member) request.getSession().getAttribute("member");
+    	String team = sessionMember.getTeam();
+    	String id = comment.getBoardId();
+    	Board board = null;
+		try {
+			board = firebaseServiceBoard.getBoardDetail(id,team);
+			return firebaseServiceComment.insertComment(comment,board,sessionMember);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+    @PostMapping("/deleteComment")
+    public void deleteComment(@RequestBody Comment comment) {
+    	System.out.println("delete Comment : " + comment);
+    	try {
+    		firebaseServiceComment.deleteComment(comment.getId());
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    @PostMapping("/updateComment")
+    public String updateComment(@RequestBody Comment comment, HttpServletRequest request) {
+    	return null;
     }
 }

@@ -37,18 +37,30 @@
 			</script>
 		</td>
 	</tr>
+	<tr>
+		<td colspan="2" align="center">
+			<input type="hidden" th:value="${board.id}" id="boardId">
+			<input type="text" class="form-control" placeholder="의견을 입력하세요" id="content">
+			<input type="button" value="등록" id="btncommentinsert" class="btn btn-primary">
+		</td>
+	</tr>
 </table>
 <h1>관련 의견 일람</h1>
+<input type="hidden" id="commentid" value="0">
 <table class="table">
 	<tr th:each="comment:${commentlist}">
 		<td><span th:text="${comment.save_name}"></span></td>
 		<td><span th:text="${comment.content}"></span></td>
-		<td><span th:text="${comment.save_date}"></span></td>
+		<td>
+			<span th:text="${comment.save_date}"></span>
+			<input th:if="${session.member.name.equals(comment.save_name)}" type="button" value="삭제" class = "btn btn-primary">
+		</td>
 	</tr>
 </table>
     <!--부트스트랩 js, jquery 추가-->
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-
+	<!--custom js 추가-->
+    <script src="/js/main.js"></script>
 </body>
 </html>

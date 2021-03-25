@@ -12,6 +12,7 @@ import com.example.demo.interfaces.FirebaseServiceCommentInterface;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -75,6 +76,21 @@ public class FirebaseServiceCommentInterfaceImpl implements FirebaseServiceComme
 			e.printStackTrace();
 		}
 		return commentlist;
+	}
+	
+	public Comment getCommentById(String id) throws Exception{
+		Firestore firestore = FirestoreClient.getFirestore();
+		DocumentReference documentReference = firestore.collection(COLLECTION_NAME).document(id);
+		ApiFuture<DocumentSnapshot> apiFuture = documentReference.get();
+		DocumentSnapshot documentSnapshot = apiFuture.get();
+		Comment comment = null;
+		if (documentSnapshot.exists()) {
+			comment = documentSnapshot.toObject(Comment.class);
+			return comment;
+		} else {
+			System.out.println(id + " is not exist");
+			return null;
+		}
 	}
 
 }
